@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>List of Movies</title>
+
+    <!--http://api.themoviedb.org/3/search/person?api_key=e7a8f7c210359818c2d775e767a0daf3&query=brad%20pitt-->
+    <!--http://api.themoviedb.org/3/person/{id}/movie_credits?api_key=e7a8f7c210359818c2d775e767a0daf3-->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore"></script>
+    <script>
+        $(function(){
+           var $div1 = $('<div>');
+           //$('body').append($div1);
+            $div1.appendTo('body');
+           var $input = $('<input>').appendTo($div1);
+           //var $div2  = $('<div>').appendTo($div1);
+
+           $input.keydown(function(evt){
+               if(evt.keyCode == 13){
+
+                   //console.log($input.val());
+                   getInfo($input.val());
+
+               }
+           });
+
+            function getInfo(str){
+
+                var $div2  = $('<div>').appendTo($div1);
+                var encoding = encodeURIComponent(str);
+                var url = 'http://api.themoviedb.org/3/search/person?api_key=e7a8f7c210359818c2d775e767a0daf3&query='+encoding;
+                var id;
+
+                $.ajax(url).done(function(values){
+                    //console.log(values);
+                    id = values.results[0].id;
+                    console.log(id);
+                    var url2 = 'http://api.themoviedb.org/3/person/'+ id +'/movie_credits?api_key=e7a8f7c210359818c2d775e767a0daf3';
+                    $.ajax(url2).done(function(values){
+                        console.log(values);
+                        var date = new Date(values.cast[0].release_date).toString();
+                        console.log(date);
+                        var arr = [];
+
+
+                        for(var prop in values.cast){
+                            //console.log(values.cast[prop].release_date);
+                            arr.push(values.cast[prop].release_date);
+
+                        }
+                        console.log(arr);
+                        arr.sort();
+                        console.log(arr);
+
+
+
+
+                        //console.log(typeof values.cast[0]);
+                        //console.log(values.cast[0].title);
+                        for(var prop in values){
+                            var x = values[prop];
+                            for (var prop in x){
+                                //console.log(x[prop].title);
+                                //console.log(x[prop].title + ' ' + x[prop].release_date);
+                                $div2.append(x[prop].title + ' ' + x[prop].release_date + '<br>' );
+                            }
+                        }
+                    });
+                })
+
+            }
+
+
+        });
+
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
