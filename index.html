@@ -23,54 +23,62 @@
                }
            });
 
+            var cache = {};
+
             function getInfo(str){
 
                 var $div2  = $('<div>').appendTo($div1);
                 var encoding = encodeURIComponent(str);
-                var url = 'http://api.themoviedb.org/3/search/person?api_key=&query='+encoding;
+
+                var url = 'http://api.themoviedb.org/3/search/person?api_key=e7a8f7c210359818c2d775e767a0daf3&query='+encoding;
                 var id;
 
-                $.ajax(url).done(function(values){
-                    //console.log(values);
-                    id = values.results[0].id;
-                    console.log(id);
-                    var url2 = 'http://api.themoviedb.org/3/person/'+ id +'/movie_credits?api_key=';
-                    $.ajax(url2).done(function(values) {
 
-                       var arr = [];
+                if(cache[str]){
 
-                        //console.log(values.cast[prop]);
-                        //arr.movie = values.cast[prop].title;
-                        //arr.year = values.cast[prop].release_date;
-                        //arr.push(values.cast[prop].release_date);
-                        //arr.sort();
+                    append(cache[str]);
+                }
+                else {
+                    $.ajax(url).done(function (values) {
+                        //console.log(values);
+                        id = values.results[0].id;
+                        console.log(id);
+                        var url2 = 'http://api.themoviedb.org/3/person/' + id + '/movie_credits?api_key=e7a8f7c210359818c2d775e767a0daf3';
+                        $.ajax(url2).done(function (values) {
 
-                        arr = values.cast.sort(function(a,b) {
-                            var date_a = new Date(a['release_date']);
-                            var date_b = new Date(b['release_date']);
+                            var arr = [];
 
-                            return date_b - date_a;
+                            //console.log(values.cast[prop]);
+                            //arr.movie = values.cast[prop].title;
+                            //arr.year = values.cast[prop].release_date;
+                            //arr.push(values.cast[prop].release_date);
+                            //arr.sort();
+
+                            arr = values.cast.sort(function (a, b) {
+                                var date_a = new Date(a['release_date']);
+                                var date_b = new Date(b['release_date']);
+
+                                return date_b - date_a;
+                            });
+
+                            cache[str] = arr;
+
+
+                            console.log(arr);
+
+                            append(arr);
+
+
                         });
+                    })
+                }
 
-                        console.log(arr);
-
-                        arr.forEach(function(element){
-                            $div2.append(element.title + ' ' + element.release_date + '<br>');
-                        });
-
-                        //console.log(typeof values.cast[0]);
-                        //console.log(values.cast[0].title);
-//                        for(var prop in values){
-//                            var x = values[prop];
-//                            for (var prop in x){
-//                                //console.log(x[prop].title);
-//                                //console.log(x[prop].title + ' ' + x[prop].release_date);
-//                                $div2.append(x[prop].title + ' ' + x[prop].release_date + '<br>' );
-//                            }
-//                        }
-
+                function append(arr){
+                    arr.forEach(function (element) {
+                        $div2.append(element.title + ' ' + element.release_date + '<br>');
                     });
-                })
+
+                }
 
             }
 
